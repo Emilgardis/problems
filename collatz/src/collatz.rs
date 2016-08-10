@@ -78,6 +78,7 @@ pub struct Collatz<'a> {
     //walked: Vec<u64>,
     /// The amount of steps we have taken to get to `curr`
     pub count: u64,
+    _skip_twos: bool,
     /// The actual sieve we are using.
     pub sieve: Option<&'a mut CollatzSieve>,
 }
@@ -104,7 +105,7 @@ impl<'a> Iterator for Collatz<'a> {
         }
         if self.curr == 1 {
             return None;
-        } else if self.curr.is_power_of_two() {
+        } else if self.curr.is_power_of_two() && self._skip_twos {
             self.count += self.curr.trailing_zeros() as u64 - 1;
             return None;
         } else if self.curr % 2 == 0 {
@@ -136,6 +137,7 @@ impl<'a> Collatz<'a> {
             orig: start,
             curr: start,
             //walked: vec![],
+            _skip_twos: true,
             count: 1, // We start don't we.
             sieve: Some(sieve),
         }
@@ -145,6 +147,7 @@ impl<'a> Collatz<'a> {
             orig: start,
             curr: start,
             //walked: vec![],
+            _skip_twos: true,
             count: 1, // We start don't we.
             sieve: None,
         }
@@ -160,6 +163,10 @@ impl<'a> Collatz<'a> {
             Some(ref mut sieve) => sieve.add_result(self.orig, self.count),
             None => (),
         };
+    }
+
+    pub fn skip_twos(&mut self, flag: bool) {
+        self._skip_twos = flag;
     }
 }
 
