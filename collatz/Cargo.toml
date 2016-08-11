@@ -4,4 +4,22 @@ version = "0.1.0"
 authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
 
 [dependencies]
-clap = "*"
+clap = "2.10"
+
+[workspace]
+
+
+[lib]
+name = "collatz"
+path = "src/lib/lib.rs"
+
+[[bin]]
+name = "collatz-gen"
+path = "src/main.rs"
+
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false

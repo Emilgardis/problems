@@ -1,15 +1,5 @@
-//! A collatz max length thing.
-//!
-//! # TODO
-//! * Use less clones, currently, the program clones pretty 
-//! much every u64 that is passed around. It is better to use references.
-//! This will make the program much less memory-hungry
-//! * Implement logging.
-//! * Put stuff in Boxes, don't know if this will fix much of the memory usage though.
-//! * Make interactive, probably with a CLI or passing flags.
-//! * Make sieve and the for-loop threaded.
-
-mod collatz;
+//! Our binary for collatz
+extern crate collatz;
 use collatz::{CollatzSieve, Collatz};
 #[macro_use]
 extern crate clap;
@@ -46,17 +36,22 @@ fn main() {
                     .version(crate_version!())
                     .author(crate_authors!())
                     .about("Collatz discovered this in 1937!")
-                    .arg(Arg::with_name("disable-sieve")
-                         .short("d")
-                         .long("disable-sieve")
-                         .help("Tells the program to disable the sieve.\n\
-                               Ignored with `get` as it already disables it.")
+                    .arg(Arg::with_name("enable-sieve")
+                         .short("e")
+                         .long("enable-sieve")
+                         .help("Tells the program to enable the sieve.{n}\
+                               Ignored with `get` as it doesn't need it.")
                         )
                     .arg(Arg::with_name("verbose")
                          .short("v")
-                         .help("Enables full output.\n\
+                         .help("Enables full output.{n}\
                                Use with `--do-twos` for more complete output.")
                          )
+                    .arg(Arg::with_name("do-twos")
+                        .long("do-twos")
+                        .short("2")
+                        .help("Disable check for powers of two.")
+                        )
                     .subcommand(SubCommand::with_name("bound")
                         .about("Calculate highest sequence of a number.")
                         .setting(AppSettings::AllowLeadingHyphen)
@@ -76,7 +71,9 @@ fn main() {
                             )
                         )
                     .get_matches();
-
+    
+    let verbose = matches.is_present("verbose");
+    let do_twos = matches.is_present("do-twos");
     match matches.subcommand() {
         ("bound", Some(sub_m)) => {
             let bound = parse_nums(sub_m.value_of("bound").unwrap().into());
@@ -90,12 +87,12 @@ fn main() {
             let mut max = (1, 1); // Longest chain, length.
             for i in range {
                 let mut coll =
-                    if !matches.is_present("disable-sieve") {
+                    if matches.is_present("enable-sieve") {
                         Collatz::with_sieve(i, &mut sieve) 
                     } else {
                         Collatz::new(i)
                     };
-                if matches.is_present("do-twos") {
+                if do_twos {
                     coll.skip_twos(false);
                 }
                 while let Some(_) = coll.next() {
@@ -109,17 +106,16 @@ fn main() {
 
             println!("Longest chain was ({}, {}).", max.0, max.1);
             
-            if !matches.is_present("disable-sieve") { 
+            if matches.is_present("enable-sieve") { 
                 println!("Length of sieve is {}\n", sieve.sieve.len());
             }
         },
         ("get", Some(sub_m)) => {
             let num = parse_nums(sub_m.value_of("number").unwrap().into())[0];
             let mut coll = Collatz::new(num);
-            if matches.is_present("do-twos") {
+            if do_twos {
                 coll.skip_twos(false);
             }
-            let verbose = matches.is_present("verbose");
             if verbose {
                 println!(" 0# {}", coll.orig);
             }

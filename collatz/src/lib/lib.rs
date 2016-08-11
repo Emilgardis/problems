@@ -1,3 +1,14 @@
+//! A collatz max length thing.
+//!
+//! # TODO
+//! * Use less clones, currently, the program clones pretty 
+//! much every u64 that is passed around. It is better to use references.
+//! This will make the program much less memory-hungry
+//! * Implement logging.
+//! * Put stuff in Boxes, don't know if this will fix much of the memory usage though.
+//! * Make interactive, probably with a CLI or passing flags.
+//! * Make sieve and the for-loop threaded.
+
 use std::iter::Iterator;
 use std::collections::BTreeMap;
 // use std::default::Default;
@@ -59,7 +70,7 @@ impl CollatzSieve {
                     Some(total_steps) => {
                         Some(total_steps - steps)
                     },
-                    None => panic!("Expected to find a result."),
+                    None => panic!("Expected to find a result in sieve for number {}.", orig),
                 }
             },
             None => None
@@ -106,7 +117,7 @@ impl<'a> Iterator for Collatz<'a> {
         if self.curr == 1 {
             return None;
         } else if self.curr.is_power_of_two() && self._skip_twos {
-            self.count += self.curr.trailing_zeros() as u64 - 1;
+            self.count += self.curr.trailing_zeros() as u64 + 0;
             return None;
         } else if self.curr % 2 == 0 {
             self.count += 1;
@@ -138,7 +149,7 @@ impl<'a> Collatz<'a> {
             curr: start,
             //walked: vec![],
             _skip_twos: true,
-            count: 1, // We start don't we.
+            count: 0,
             sieve: Some(sieve),
         }
     }
@@ -148,7 +159,7 @@ impl<'a> Collatz<'a> {
             curr: start,
             //walked: vec![],
             _skip_twos: true,
-            count: 1, // We start don't we.
+            count: 0, // We start don't we.
             sieve: None,
         }
     }
