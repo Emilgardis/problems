@@ -34,7 +34,7 @@ pub struct CollatzSieve {
 }// TODO: Make generic over all Sized and Eq
 
 impl CollatzSieve {
-    /// Make a new sieve. Set dummy to true to disable any actual functionality.
+    /// Make a new sieve.
     pub fn new() -> CollatzSieve {
         CollatzSieve {
             sieve: BTreeMap::new(),
@@ -61,8 +61,8 @@ impl CollatzSieve {
     /// Checks if this entry exists, if it does, how many steps to tumble down?
     ///
     /// # Panics
-    /// Panics if we know about a value, but not about it's `orig`. This is probably
-    /// something that hinders thread-safety.
+    /// Panics if we know about a value, but not about it's `orig`. This is a 
+    /// problem that probably is something that hinders thread-safety.
     pub fn in_sieve(&self, val: &u64) -> Option<u64> {
         match self.sieve.get(val) {
             Some(&(steps, orig)) => {

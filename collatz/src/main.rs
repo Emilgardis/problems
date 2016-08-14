@@ -36,6 +36,8 @@ fn main() {
                     .version(crate_version!())
                     .author(crate_authors!())
                     .about("Collatz discovered this in 1937!")
+                    .setting(AppSettings::SubcommandRequiredElseHelp)
+                    .setting(AppSettings::UnifiedHelpMessage)
                     .arg(Arg::with_name("enable-sieve")
                          .short("e")
                          .long("enable-sieve")
@@ -127,7 +129,6 @@ fn main() {
             println!("Length of collatz sequence of {}: {}", num, coll.count);
         },
         (_, _) => {
-            println!("Nothing to do");
         }
     }
 }
