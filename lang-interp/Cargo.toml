@@ -1,0 +1,11 @@
+[package]
+name = "lang-interp"
+version = "0.1.0"
+authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
+
+[dependencies]
+clap = "*"
+
+[[bin]]
+name = "language-interpretor"
+path = "src/main.rs"
