@@ -6,7 +6,7 @@
 extern crate clap;
 use clap::{App, Arg, SubCommand};
 
-use lang_interp::ToHistogram;
+use lang_interp::{ToHistogram, Language};
 extern crate lang_interp;
 
 use std::fs::File;
@@ -42,12 +42,39 @@ fn main() {
                     )
         .get_matches();
 
-    match matches.subcommand_name() {
-        Some("learn") => {
+    match matches.subcommand() {
+        ("learn", Some(sub_m)) => {
+            let mut buf = String::new();
+
+            File::open(sub_m.value_of("file").unwrap())
+                .unwrap_or_else(|_| panic!("Couldn't open file."))
+                .read_to_string(&mut buf).unwrap();
+            // Implement blacklist!
+            //
             
+            {
+                let lang = Language { 
+                    language: sub_m.value_of("language").unwrap().into(),
+                    histogram: buf.to_histogram(),
+                };
+                lang.write_lang(format!("{}.lang", sub_m.value_of("language").unwrap()));
+            }
         },
-        
-        _ => ()
+        ("guess", Some(sub_m)) => {
+            let mut buf = String::new();
+
+            File::open(sub_m.value_of("file").unwrap())
+                .unwrap_or_else(|_| panic!("Couldn't open file."))
+                .read_to_string(&mut buf).unwrap();
+            
+            let lang_test = Language::open_lang(format!("{}/assets/svenska.lang", env!("CARGO_MANIFEST_DIR")).histogram.to_ranking();
+            let example = buf.to_histogram().to_ranking();
+            
+            println!("{}", lang_test.similarity(&example))
+        } 
+        _ => {
+            
+        }
     }
 }
 

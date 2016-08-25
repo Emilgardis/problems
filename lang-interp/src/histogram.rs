@@ -2,6 +2,8 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::fmt;
 
+
+#[derive(Serialize, Deserialize)]
 pub struct Histogram<Data> where Data: Ord {
     source: BTreeMap<Data, u64>,
     total_entries: u64,
@@ -31,8 +33,8 @@ impl<Data> fmt::Debug for Histogram<Data> where Data: Ord + fmt::Debug {
     }
 }
 
-#[derive(Debug)]
-pub struct Ranking<Data>(BTreeMap<Data, f64>);
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Ranking<Data: Ord + Sized>(BTreeMap<Data, f64>);
 
 impl<Data> Ranking<Data> where Data: Ord {
     pub fn similarity(&self, other: &Ranking<Data>) -> f64 {
