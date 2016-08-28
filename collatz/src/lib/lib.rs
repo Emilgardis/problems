@@ -10,7 +10,7 @@
 //! * Make sieve and the for-loop threaded.
 
 use std::iter::Iterator;
-use std::collections::BTreeMap;
+use std::collections::{HashMap, BTreeMap};
 // use std::default::Default;
 
 /// A sieve for our number crunching
@@ -20,11 +20,11 @@ use std::collections::BTreeMap;
 pub struct CollatzSieve {
     /// Holds all known values that go to 1, except for powers of two.
     /// The tuple includes `(steps, origin)`.
-    pub sieve: BTreeMap<u64, (u64, u64)>,
+    pub sieve: HashMap<u64, (u64, u64)>,
     /// Holds the total steps required to get to 1, together with `sieve`
     /// this allows us to compute the steps required to get to 1.
     /// This is done easily by computing `total_steps` **-** `steps`
-    pub sieve_data: BTreeMap<u64, u64>,
+    pub sieve_data: HashMap<u64, u64>,
     /// Unimplemented.
     ///
     /// FIXME
@@ -37,8 +37,8 @@ impl CollatzSieve {
     /// Make a new sieve.
     pub fn new() -> CollatzSieve {
         CollatzSieve {
-            sieve: BTreeMap::new(),
-            sieve_data: BTreeMap::new(),
+            sieve: HashMap::new(),
+            sieve_data: HashMap::new(),
             _access_debug: BTreeMap::new(),
         }
     }

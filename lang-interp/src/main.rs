@@ -8,13 +8,14 @@ mod find_lang;
 extern crate clap;
 use clap::{App, Arg, SubCommand};
 
-pub use lang_interp::{ToHistogram, Language};
+pub use lang_interp::{ToNGram, Language};
 extern crate lang_interp;
 
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
 use std::io::{ErrorKind, Read, Error as IoErr};
+use std::collections::BTreeMap;
 
 fn open_file<T: AsRef<Path>>(file_path: T) -> Result<String, IoErr> {
     let mut buf = String::new();
@@ -47,14 +48,13 @@ fn main() {
     match matches.subcommand() {
         ("learn", Some(sub_m)) => {
             let mut buf = open_file(sub_m.value_of("file").unwrap()).unwrap();
-
-            // Implement blacklist!
-            //
-            
+            let mut ngrams = BTreeMap::new();
+            ngrams.insert(1, buf.clone().to_ngram(1));
+            ngrams.insert(2, buf.clone().to_ngram(2));
             {
                 let lang = Language { 
                     language: sub_m.value_of("language").unwrap().into(),
-                    histogram: buf.to_histogram(),
+                    ngrams: ngrams,
                 };
                 lang.write_lang(format!("{}.lang", sub_m.value_of("language").unwrap()));
             }
@@ -68,9 +68,9 @@ fn main() {
                 println!("No languages found, please add \".lang\" files via the learn command\n\
                          See learn --help")
             }
-            let example = buf.to_histogram().to_ranking();
+            let example = buf.to_ngram(2).as_ranking();
             for lang in langs {
-                println!("{}: {}", lang.language, lang.histogram.to_ranking().similarity(&example))
+                println!("{}: {}", lang.language, lang.ngrams.get(&2u8).unwrap().as_ranking().similarity(&example))
             }
         } 
         _ => {

@@ -4,10 +4,10 @@
 extern crate serde;
 extern crate serde_yaml;
 
-mod histogram;
+mod ngram;
 mod language;
 
-pub use histogram::{ToHistogram, Histogram};
+pub use ngram::{ToNGram, NGram};
 pub use language::Language;
 #[cfg(test)]
 mod tests {

@@ -4,17 +4,17 @@ use serde;
 use serde_yaml;
 use std::path::Path;
 use std::fs::OpenOptions;
+use std::collections::BTreeMap;
 
-use super::histogram::Histogram;
+use super::ngram::NGram;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Language {
     pub language: String,
-    pub histogram: Histogram<String>,
+    pub ngrams: BTreeMap<u8, NGram<String>>,
 }
 
 impl Language {
-    // TODO: Implement n-grams, ie freq of "aa", "ab", .."zz", see
     // http://stackoverflow.com/a/15711310/4284367
 
     pub fn open_lang<T: AsRef<Path>>(file_path: T) -> Language {

@@ -1,6 +1,6 @@
 [package]
 name = "lang-interp"
-version = "0.6.1"
+version = "0.7.0"
 authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
 
 [dependencies]
@@ -8,6 +8,7 @@ clap = "*"
 serde = "*"
 serde_yaml = "*"
 serde_macros = "*"
+
 [[bin]]
 name = "language-interpretor"
 path = "src/main.rs"
