@@ -10,7 +10,7 @@ use super::histogram::Histogram;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Language {
     pub language: String,
-    pub histogram: Histogram<char>,
+    pub histogram: Histogram<String>,
 }
 
 impl Language {

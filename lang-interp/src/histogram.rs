@@ -54,13 +54,16 @@ pub trait ToHistogram<Data> where Data: Ord {
     fn to_histogram(self) -> Histogram<Data>;
 }
 
-impl ToHistogram<char> for String {
-    fn to_histogram(self) -> Histogram<char> {
+impl ToHistogram<String> for String {
+    fn to_histogram(self) -> Histogram<String> {
         let mut count = BTreeMap::new();
         let mut entries = 0;
         for c in self.chars() {
-            entries += 1;
-            *count.entry(c).or_insert(0) += 1;
+            if c.is_alphabetic() {
+                let c_lc = c.to_lowercase().collect();
+                entries += 1;
+                *count.entry(c_lc).or_insert(0) += 1;
+            }
         }
         Histogram::new(count, entries)
     }
