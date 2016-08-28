@@ -7,7 +7,7 @@ use std::fs;
 use std::io;
 
 pub fn find_languages<T: AsRef<Path>>(dir: T, depth: u8) -> Result<Vec<Language>, io::Error> {
-    if dir.as_ref().is_dir() || depth != 0 {
+    if dir.as_ref().is_dir() && depth != 0 {
         let mut result: Vec<Language> = vec![];
         for entry in try!(fs::read_dir(dir.as_ref())) {
             let entry = try!(entry);
