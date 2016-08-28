@@ -14,7 +14,9 @@ pub struct Language {
 }
 
 impl Language {
-    
+    // TODO: Implement n-grams, ie freq of "aa", "ab", .."zz", see
+    // http://stackoverflow.com/a/15711310/4284367
+
     pub fn open_lang<T: AsRef<Path>>(file_path: T) -> Language {
         if let Ok(mut file) = OpenOptions::new()
              .read(true).open(file_path.as_ref()) {                   

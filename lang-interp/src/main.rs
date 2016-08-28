@@ -1,23 +1,25 @@
+#![feature(question_mark)]
 //! Binary
 //!
 
+mod find_lang;
 
 #[macro_use]
 extern crate clap;
 use clap::{App, Arg, SubCommand};
 
-use lang_interp::{ToHistogram, Language};
+pub use lang_interp::{ToHistogram, Language};
 extern crate lang_interp;
 
 use std::fs::File;
 use std::path::Path;
 use std::error::Error;
-use std::io::{ErrorKind, Read};
+use std::io::{ErrorKind, Read, Error as IoErr};
 
-fn open_file<T: AsRef<Path>>(file_path: T) -> String {
+fn open_file<T: AsRef<Path>>(file_path: T) -> Result<String, IoErr> {
     let mut buf = String::new();
-    File::open(file_path.as_ref()).unwrap().read_to_string(&mut buf).unwrap();
-    buf
+    File::open(file_path.as_ref())?.read_to_string(&mut buf)?;
+    Ok(buf)
 }
 
 fn main() {
@@ -44,11 +46,8 @@ fn main() {
 
     match matches.subcommand() {
         ("learn", Some(sub_m)) => {
-            let mut buf = String::new();
+            let mut buf = open_file(sub_m.value_of("file").unwrap()).unwrap();
 
-            File::open(sub_m.value_of("file").unwrap())
-                .unwrap_or_else(|_| panic!("Couldn't open file."))
-                .read_to_string(&mut buf).unwrap();
             // Implement blacklist!
             //
             
@@ -61,16 +60,18 @@ fn main() {
             }
         },
         ("guess", Some(sub_m)) => {
-            let mut buf = String::new();
-
-            File::open(sub_m.value_of("file").unwrap())
-                .unwrap_or_else(|_| panic!("Couldn't open file."))
-                .read_to_string(&mut buf).unwrap();
+            let mut buf = open_file(sub_m.value_of("file").unwrap()).unwrap();
             
-            let lang_test = Language::open_lang(format!("{}/assets/svenska.lang", env!("CARGO_MANIFEST_DIR")).histogram.to_ranking();
+            let langs = find_lang::find_languages(format!(
+                    "{}/assets/", env!("CARGO_MANIFEST_DIR")), 1).unwrap();
+            if langs.len() == 0 {
+                println!("No languages found, please add \".lang\" files via the learn command\n\
+                         See learn --help")
+            }
             let example = buf.to_histogram().to_ranking();
-            
-            println!("{}", lang_test.similarity(&example))
+            for lang in langs {
+                println!("{}: {}", lang.language, lang.histogram.to_ranking().similarity(&example))
+            }
         } 
         _ => {
             
