@@ -23,7 +23,7 @@ impl Language {
             if let Ok(data) = serde_yaml::from_reader(&mut file) {
                 data
             } else {
-                panic!("Couldn't parse file")
+                panic!("Couldn't parse file {:?}", file)
             }
         } else {
             unreachable!()

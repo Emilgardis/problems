@@ -27,6 +27,13 @@ impl<Data> NGram<Data> where Data: Ord + Clone {
         }
         Ranking(stack)
     }
+
+    pub fn append(&mut self, other: NGram<Data>) {
+        for (ch, count) in other.source.iter() {
+            *self.source.entry(ch.clone()).or_insert(1) += count.clone();
+        }
+        self.total_entries += other.total_entries;
+    }
 }
 
 impl<Data> fmt::Debug for NGram<Data> where Data: Ord + fmt::Debug + Clone {
@@ -73,7 +80,7 @@ impl ToNGram<String> for String {
         } else if n == 2 {
             let mut count = BTreeMap::new();
             let mut entries = 0;
-            let mut filtered: String = self.chars().filter(|a| a.is_alphabetic() || a.is_whitespace()).collect();
+            //let mut filtered: String = self.chars().filter(|a| a.is_alphabetic() || a.is_whitespace()).collect();
             let mut c_iter = self.chars().peekable();
             while let Some(c) = c_iter.next() {
                 let other = match c_iter.peek() {
