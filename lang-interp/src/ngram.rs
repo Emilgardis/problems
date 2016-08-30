@@ -34,6 +34,38 @@ impl<Data> NGram<Data> where Data: Ord + Clone {
         }
         self.total_entries += other.total_entries;
     }
+    
+    pub fn cos_simularity(&self, other: &NGram<Data>) -> Option<f64> {
+        let mut A = Vec::new();
+        let mut B = Vec::new();
+        for (cA, countA) in self.source.iter() {
+            match other.source.get(cA) {
+                Some(countB) => {
+                    A.push(countA);
+                    B.push(countB);
+                },
+                None => (),
+            }
+        }
+        assert_eq!(A.len(), B.len());
+        
+        if A.len() < 2 {
+            return None;
+        }
+        let mut A2: f64 = 0.0;
+        let mut B2: f64 = 0.0;
+        let mut AB: f64 = 0.0;
+        for (a, b) in A.iter().zip(B.iter()) {
+            A2 += (**a as f64).powi(2);
+            B2 += (**b as f64).powi(2);
+            AB += (**a as f64)*(**b as f64);
+        }
+        Some(AB/(A2.sqrt() * B2.sqrt()))
+    }
+    pub fn cos_simularity_with_0(&self, other: NGram<Data>) -> f64 {
+        unimplemented!()
+        
+    }
 }
 
 impl<Data> fmt::Debug for NGram<Data> where Data: Ord + fmt::Debug + Clone {

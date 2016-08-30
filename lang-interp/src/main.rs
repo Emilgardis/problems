@@ -68,9 +68,14 @@ fn main() {
                 println!("No languages found, please add \".lang\" files via the learn command\n\
                          See learn --help")
             }
-            let example = buf.to_ngram(2).as_ranking();
+            let example = buf.to_ngram(2);
+            println!("Calculating levhenstein fitness.");
+            for lang in &langs {
+                println!("\t{}: {}", lang.language, lang.ngrams.get(&2u8).unwrap().as_ranking().similarity(&example.as_ranking()))
+            }
+            println!("Calculating cosine simularity for");
             for lang in langs {
-                println!("{}: {}", lang.language, lang.ngrams.get(&2u8).unwrap().as_ranking().similarity(&example))
+                println!("{\t}: {}", lang.language, lang.ngrams.get(&2u8).unwrap().cos_simularity(&example).unwrap())
             }
         } 
         _ => {
