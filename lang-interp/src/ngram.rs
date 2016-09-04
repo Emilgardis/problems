@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::string::String;
 use std::fmt;
 
-
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NGram<Data> where Data: Ord + Clone {
     source: BTreeMap<Data, u64>,
@@ -83,8 +82,10 @@ impl<Data> Ranking<Data> where Data: Ord {
         for (data, p1) in &self.0 {
             if let Some(p2) = other.0.get(&data) {
                 fitness += (p1 - p2).abs();
+                //print!("+{}", (p1 - p2).abs() )
             } else {
                 fitness += *p1;
+                //print!("+{}", p1 )
             }
         }
         fitness
