@@ -20,11 +20,11 @@ use std::collections::{HashMap, BTreeMap};
 pub struct CollatzSieve {
     /// Holds all known values that go to 1, except for powers of two.
     /// The tuple includes `(steps, origin)`.
-    pub sieve: HashMap<u64, (u64, u64)>,
+    pub sieve: BTreeMap<u64, (u64, u64)>,
     /// Holds the total steps required to get to 1, together with `sieve`
     /// this allows us to compute the steps required to get to 1.
     /// This is done easily by computing `total_steps` **-** `steps`
-    pub sieve_data: HashMap<u64, u64>,
+    pub sieve_data: BTreeMap<u64, u64>,
     /// Unimplemented.
     ///
     /// FIXME
@@ -37,7 +37,7 @@ impl CollatzSieve {
     /// Make a new sieve.
     pub fn new() -> CollatzSieve {
         CollatzSieve {
-            sieve: HashMap::new(),
+            sieve: BTreeMap::new(),
             sieve_data: HashMap::new(),
             _access_debug: BTreeMap::new(),
         }
@@ -106,35 +106,26 @@ impl<'a> Iterator for Collatz<'a> {
     type Item = u64;
     fn next(&mut self) -> Option<u64> {
         //if self.orig == 8400511 { println!("{0}\t{1} - {1:#b} n^2: {2:?}", self.count, self.curr, self.curr.is_power_of_two()); }
-        match self.sieve.as_ref().map_or(None, |ref mut sieve| sieve.in_sieve(&self.curr)) {
-            Some(steps) => {
-                //println!("{} found {} in sieve, added {} steps", self.orig, self.curr, steps+1);
-                self.count += steps+1;
-                return None;
-            },
-            None => {},
-        }
+        if let Some(steps) = self.sieve.as_ref().map_or(None, |ref mut sieve| sieve.in_sieve(&self.curr)) {
+    //println!("{} found {} in sieve, added {} steps", self.orig, self.curr, steps+1);
+    self.count += steps+1;
+    return None;
+}
         if self.curr == 1 {
             return None;
-        } else if self.curr.is_power_of_two() && self._skip_twos {
+        } else if self._skip_twos && self.curr.is_power_of_two() {
             self.count += self.curr.trailing_zeros() as u64 + 0;
             return None;
         } else if self.curr % 2 == 0 {
             self.count += 1;
             //self.walked.push(self.curr);
             //self.sieve.insert(self.curr, self.count, self.orig);
-            match self.sieve{
-                Some(ref mut sieve) => sieve.insert(self.curr, self.count, self.orig),
-                None => (),
-            };
-            self.curr = self.curr / 2;
+            if let Some(ref mut sieve) = self.sieve { sieve.insert(self.curr, self.count, self.orig) };
+            self.curr /= 2;
         } else {
             self.count += 1;
             //self.walked.push(self.curr);
-            match self.sieve{
-                Some(ref mut sieve) => sieve.insert(self.curr, self.count, self.orig),
-                None => (),
-            };
+            if let Some(ref mut sieve) = self.sieve { sieve.insert(self.curr, self.count, self.orig) };
             self.curr = (3 * self.curr)+1; // We know from math that odd*odd + 1 is even. 
             // But that will rest for now.
         }
@@ -170,10 +161,7 @@ impl<'a> Collatz<'a> {
     /// Make this more seamless, currently calling `register` before returning `None`
     /// is done only because I'm not sure how to implement this. Possibly with `Drop`?
     pub fn register(&mut self) {
-        match self.sieve {
-            Some(ref mut sieve) => sieve.add_result(self.orig, self.count),
-            None => (),
-        };
+        if let Some(ref mut sieve) = self.sieve { sieve.add_result(self.orig, self.count) };
     }
 
     pub fn skip_twos(&mut self, flag: bool) {

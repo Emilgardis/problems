@@ -3,7 +3,7 @@ extern crate collatz;
 use collatz::{CollatzSieve, Collatz};
 #[macro_use]
 extern crate clap;
-use clap::{App, AppSettings, Arg, SubCommand};
+use clap::{App, AppSettings, Arg, SubCommand, Values};
 
 use std::error::Error;
 
@@ -23,11 +23,11 @@ fn validate_nums(v: String) -> Result<(), String> {
             }
         }
     }
-    return Ok(())
+    Ok(())
 }
 
-fn parse_nums(v: String) -> Vec<u64> {
-    v.split_whitespace().map(|num| num.parse::<f64>().unwrap() as u64).collect()
+fn parse_nums(v: Values) -> Vec<u64> {
+    v.map(|num| num.parse::<f64>().unwrap() as u64).collect()
 }
 
 fn main() {
@@ -61,6 +61,7 @@ fn main() {
                             .min_values(1)
                             .max_values(2)
                                 .validator(validate_nums)
+                                .use_delimiter(true)
                                 .required(true)
                             )
                         )
@@ -69,6 +70,7 @@ fn main() {
                         .setting(AppSettings::AllowLeadingHyphen)
                         .arg(Arg::with_name("number")
                             .required(true)
+                            .max_values(1)
                             .validator(validate_nums)
                             )
                         )
@@ -78,7 +80,8 @@ fn main() {
     let do_twos = matches.is_present("do-twos");
     match matches.subcommand() {
         ("bound", Some(sub_m)) => {
-            let bound = parse_nums(sub_m.value_of("bound").unwrap().into());
+            let bound = parse_nums(sub_m.values_of("bound").unwrap());
+            println!("Got: {:?}", bound);
             let range = if bound.len() == 2 {
                 (bound[0]..(bound[1] + 1))
             } else {
@@ -113,7 +116,7 @@ fn main() {
             }
         },
         ("get", Some(sub_m)) => {
-            let num = parse_nums(sub_m.value_of("number").unwrap().into())[0];
+            let num = parse_nums(sub_m.values_of("number").unwrap())[0].into();
             let mut coll = Collatz::new(num);
             if do_twos {
                 coll.skip_twos(false);
