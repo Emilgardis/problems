@@ -1,7 +1,7 @@
-#![feature(plugin)]
-#![plugin(serde_macros)]
-#![feature(custom_derive)]
+#![feature(proc_macro)]
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_yaml;
 
 mod ngram;

@@ -70,14 +70,6 @@ fn main() {
             }
             let example1 = buf.clone().to_ngram(1);
             let example2 = buf.to_ngram(2);
-            println!("Calculating levhenstein fitness.");
-            for lang in &langs {
-                println!("{}:", lang.language);
-                println!("1: {}", lang.ngrams.get(&2u8).unwrap().as_ranking()
-                         .similarity(&example1.as_ranking()));
-                println!("2: {}", lang.ngrams.get(&2u8).unwrap().as_ranking()
-                         .similarity(&example2.as_ranking()));
-            }
             let mut highest = ("", -1.0);
             println!("Calculating cosine simularity for");
             for lang in &langs {
@@ -94,16 +86,21 @@ fn main() {
                         combined = None;
                     },
                 }
-                match lang.ngrams.get(&2u8).unwrap().cos_simularity(&example2){
-                    Some(r) => {
-                        println!("\t2: {} %", r);
-                        if let Some(comb) = combined {
-                            combined = Some(comb + r/2.0);
+                match lang.ngrams.get(&2u8) {
+                    Some(res) => {
+                        match res.cos_simularity(&example2){
+                            Some(r) => {
+                                println!("\t2: {} %", r);
+                                if let Some(comb) = combined {
+                                    combined = Some(comb + r/2.0);
+                                }
+                            },
+                            None => {
+                                println!("\t2: Not enough data for 2-gram.");
+                            },
                         }
                     },
-                    None => {
-                        println!("\t2: Not enough data.");
-                    },
+                    None => println!("\tNo data for 2-gram"),
                 }
                 if combined.is_some() && combined.unwrap() > highest.1 {
                     highest = (lang.language.as_ref(), combined.unwrap());
