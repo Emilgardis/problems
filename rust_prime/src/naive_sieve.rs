@@ -16,6 +16,7 @@ pub struct ArSieve {
     _current: u64,
     limit: u64,
 }
+
 impl ArSieve {
     pub fn new(limit: u64) -> ArSieve {
         let sieve = Box::new(BTreeMap::new());

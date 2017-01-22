@@ -23,7 +23,7 @@ def prime_gen():
             # count is a prime, now yield and find multiple
             yield count
             sieve[count*count] = [count]
-
+            print(sieve)
         else:
             # count is a composite, now
             for p in sieve[count]:
@@ -77,7 +77,7 @@ def prime_gen3():
             D[x] = p
 
 
-def prime_factors(n, prime_genx=prime_gen3):
+def prime_factors(n, prime_genx=prime_gen):
     """Gives all prime factors of n"""
     factors = []
     start = n

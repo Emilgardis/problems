@@ -3,8 +3,10 @@
 extern crate test;
 extern crate prime;
 
-pub fn primes(limit: u64) -> Vec<prime::sieve::Prime> {
-    let sieve = prime::sieve::ArSieve::new(limit);
+use prime::naive::sieve;
+
+pub fn primes(limit: u64) -> Vec<sieve::Prime> {
+    let sieve = sieve::ArSieve::new(limit);
     let mut result = Vec::new();
     for prime in sieve {
         result.push(prime);

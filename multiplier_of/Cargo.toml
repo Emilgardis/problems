@@ -1,0 +1,16 @@
+[package]
+name = "multiplier_of"
+version = "0.1.0"
+authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
+
+
+[lib]
+name = "multipliers_of_numbers"
+path = "src/lib.rs"
+
+[[bin]]
+name = "multipliers"
+path = "src/main.rs"
+[dependencies]
+permutahedron = "*"
+
