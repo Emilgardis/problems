@@ -38,7 +38,7 @@ impl CollatzSieve {
     pub fn new() -> CollatzSieve {
         CollatzSieve {
             sieve: BTreeMap::new(),
-            sieve_data: HashMap::new(),
+            sieve_data: BTreeMap::new(),
             _access_debug: BTreeMap::new(),
         }
     }
