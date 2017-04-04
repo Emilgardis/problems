@@ -46,8 +46,8 @@ fn main() {
                         )
                     .arg(Arg::with_name("verbose")
                          .short("v")
-                         .help("Enables full output.{n}\
-                               Use with `--do-twos` for more complete output.")
+                         .help("Enables more output.{n}\
+                               Usable with `--do-twos` and `--enable-sieve` for more complete output.")
                          )
                     .arg(Arg::with_name("do-twos")
                         .long("do-twos")
@@ -110,9 +110,11 @@ fn main() {
             }
 
             println!("Longest chain was ({}, {}).", max.0, max.1);
-            
-            if matches.is_present("enable-sieve") { 
+
+            if matches.is_present("enable-sieve") && matches.is_present("verbose"){ 
                 println!("Length of sieve is {}\n", sieve.sieve.len());
+                println!("Sieve:\n{:?}", sieve.sieve);
+                println!("-----------Sieve data:\n{:?}", sieve.sieve_data);
             }
         },
         ("get", Some(sub_m)) => {
