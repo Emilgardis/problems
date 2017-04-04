@@ -4,6 +4,9 @@
 extern crate num;
 #[macro_use]
 extern crate num_derive;
+extern crate itertools;
+
+use itertools::Itertools;
 
 #[repr(u16)]
 // Store as u8, u16 is uneeded.
@@ -29,20 +32,27 @@ impl Roman {
     // TODO: Multiple subtraction.
     pub fn as_usize(&self) -> usize {
         let mut sum = 0;
-        let mut iter = self.0.clone().into_iter().peekable();
-        while let Some(numeral) = iter.next() {
-
-            if iter.peek().is_none() || iter.peek().unwrap() <= &numeral {
-                // Unwrap should never panic
-                println!("{}", numeral.clone() as usize);
-                sum += numeral as usize;
+        // Make an iterator over (usize, RomanNumeral)
+        // where the usize is times repeated
+        let mut iter = self.0.clone().into_iter().map(|e| (e, 1)).coalesce(|x, y| {
+            if x.0 == y.0 {
+                Ok((x.0, x.1 + y.1))
             } else {
-
-                println!("{} - {}",
-                         iter.peek().unwrap().clone() as usize,
+                Err((x, y))
+            }
+        }).peekable();
+        while let Some((numeral, reps)) = iter.next() {
+            // Unwrap should never panic
+            if iter.peek().is_none() || iter.peek().unwrap().0 < numeral {
+                println!("{}", numeral.clone() as usize);
+                sum += numeral as usize * reps;
+            } else {
+                println!("{:?} - {}",
+                         iter.peek().unwrap().clone().0 as usize,
                          numeral.clone() as usize);
                 //while iter.peek().is_some() && iter.peek().unwrap() >
-                sum += iter.next().unwrap() as usize - numeral as usize;
+                let (n_next, n_reps) = iter.next().unwrap();
+                sum += (n_next as usize * n_reps) - (numeral as usize * reps);
             }
         }
         sum

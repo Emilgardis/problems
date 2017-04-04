@@ -6,4 +6,5 @@ authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
 [dependencies]
 num = "*"
 num-derive = "*"
+itertools = "*"
 clippy = {version = "*", optional = true}
