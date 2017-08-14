@@ -1,0 +1,7 @@
+[package]
+authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
+name = "dice_spell"
+version = "0.1.0"
+[dependencies]
+clap = "2.26.0"
+error-chain = "0.11.0-rc.2"
