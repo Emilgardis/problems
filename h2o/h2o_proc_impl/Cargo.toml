@@ -1,0 +1,13 @@
+[package]
+name = "h2o_proc_impl"
+version = "0.1.0"
+authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
+
+[dependencies]
+proc-macro-hack = "0.3"
+syn = "*"
+quote = "*"
+inflector = "*"
+
+[lib]
+proc-macro = true
