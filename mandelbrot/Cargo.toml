@@ -1,0 +1,10 @@
+[package]
+name = "mandelbrot"
+version = "0.1.0"
+authors = ["Emil Gardström <emil.gardstrom@gmail.com>"]
+
+[dependencies]
+clap = "*"
+num = "*"
+image = "*"
+rayon = "*"
