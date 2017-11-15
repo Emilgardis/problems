@@ -1,13 +1,7 @@
 //! A collatz max length thing.
 //!
 //! # TODO
-//! * Use less clones, currently, the program clones pretty 
-//! much every u64 that is passed around. It is better to use references.
-//! This will make the program much less memory-hungry
 //! * Implement logging.
-//! * Put stuff in Boxes, don't know if this will fix much of the memory usage though.
-//! * Make interactive, probably with a CLI or passing flags.
-//! * Make sieve and the for-loop threaded.
 
 use std::iter::Iterator;
 use std::collections::{HashMap, BTreeMap};
@@ -42,7 +36,7 @@ impl CollatzSieve {
             _access_debug: BTreeMap::new(),
         }
     }
-    /// Insert data about a certain value. 
+    /// Insert data about a certain value.
     ///
     /// # Fields
     /// * `val` is the number we are handling
@@ -51,7 +45,7 @@ impl CollatzSieve {
     pub fn insert(&mut self, val: u64, steps: u64, orig: u64) {
         self.sieve.insert(val, (steps, orig));
     }
-    
+
     /// Adds `orig` to `sieve_data`. This means we now have complete knowledge of
     /// any new number we've gone throuqh.
     pub fn add_result(&mut self, orig: u64, total_steps: u64) {
@@ -61,19 +55,17 @@ impl CollatzSieve {
     /// Checks if this entry exists, if it does, how many steps to tumble down?
     ///
     /// # Panics
-    /// Panics if we know about a value, but not about it's `orig`. This is a 
+    /// Panics if we know about a value, but not about it's `orig`. This is a
     /// problem that probably is something that hinders thread-safety.
     pub fn in_sieve(&self, val: &u64) -> Option<u64> {
         match self.sieve.get(val) {
             Some(&(steps, orig)) => {
                 match self.sieve_data.get(&orig) {
-                    Some(total_steps) => {
-                        Some(total_steps - steps)
-                    },
+                    Some(total_steps) => Some(total_steps - steps),
                     None => panic!("Expected to find a result in sieve for number {}.", orig),
                 }
-            },
-            None => None
+            }
+            None => None,
         }
     }
 }
@@ -86,7 +78,7 @@ pub struct Collatz<'a> {
     pub orig: u64,
     /// The current value we are processing
     pub curr: u64,
-    //walked: Vec<u64>,
+    // walked: Vec<u64>,
     /// The amount of steps we have taken to get to `curr`
     pub count: u64,
     _skip_twos: bool,
@@ -105,28 +97,32 @@ impl<'a> Drop for Collatz<'a> {
 impl<'a> Iterator for Collatz<'a> {
     type Item = u64;
     fn next(&mut self) -> Option<u64> {
-        //if self.orig == 8400511 { println!("{0}\t{1} - {1:#b} n^2: {2:?}", self.count, self.curr, self.curr.is_power_of_two()); }
-        if let Some(steps) = self.sieve.as_ref().map_or(None, |ref mut sieve| sieve.in_sieve(&self.curr)) {
-    //println!("{} found {} in sieve, added {} steps", self.orig, self.curr, steps+1);
-    self.count += steps+1;
-    return None;
-}
+        if let Some(steps) = self.sieve
+            .as_ref()
+            .map_or(None, |ref mut sieve| sieve.in_sieve(&self.curr)) {
+            // println!("{} found {} in sieve, added {} steps", self.orig, self.curr, steps+1);
+            self.count += steps + 1;
+            return None;
+        }
         if self.curr == 1 {
             return None;
         } else if self._skip_twos && self.curr.is_power_of_two() {
-            self.count += self.curr.trailing_zeros() as u64 + 0;
+            self.count += self.curr.trailing_zeros() as u64;
+            self.curr = 1;
             return None;
         } else if self.curr % 2 == 0 {
             self.count += 1;
-            //self.walked.push(self.curr);
-            //self.sieve.insert(self.curr, self.count, self.orig);
-            if let Some(ref mut sieve) = self.sieve { sieve.insert(self.curr, self.count, self.orig) };
+            if let Some(ref mut sieve) = self.sieve {
+                sieve.insert(self.curr, self.count, self.orig)
+            };
             self.curr /= 2;
         } else {
             self.count += 1;
-            //self.walked.push(self.curr);
-            if let Some(ref mut sieve) = self.sieve { sieve.insert(self.curr, self.count, self.orig) };
-            self.curr = (3 * self.curr)+1; // We know from math that odd*odd + 1 is even. 
+            // self.walked.push(self.curr);
+            if let Some(ref mut sieve) = self.sieve {
+                sieve.insert(self.curr, self.count, self.orig)
+            };
+            self.curr = (3 * self.curr) + 1; // We know from math that odd*odd + 1 is even.
             // But that will rest for now.
         }
         Some(self.curr)
@@ -138,35 +134,37 @@ impl<'a> Collatz<'a> {
         Collatz {
             orig: start,
             curr: start,
-            //walked: vec![],
+            // walked: vec![],
             _skip_twos: true,
             count: 0,
             sieve: Some(sieve),
         }
     }
+    /// Constructs a new collatz generator
+    /// # Notes:
+    /// `0` will never end.
     pub fn new(start: u64) -> Collatz<'a> {
         Collatz {
             orig: start,
             curr: start,
-            //walked: vec![],
+            // walked: vec![],
             _skip_twos: true,
             count: 0, // We start don't we.
             sieve: None,
         }
     }
-    /// Called before the iterator returns `None`. Sets the appropriate values
+    /// Sets the appropriate values
     /// `orig` and `total_steps` to the sieve's `sieve_data`
-    /// 
-    /// # TODO
-    /// Make this more seamless, currently calling `register` before returning `None`
-    /// is done only because I'm not sure how to implement this. Possibly with `Drop`?
+    ///
     pub fn register(&mut self) {
-        if let Some(ref mut sieve) = self.sieve { sieve.add_result(self.orig, self.count) };
+        if self.curr == 1 {
+            if let Some(ref mut sieve) = self.sieve {
+                sieve.add_result(self.orig, self.count)
+            }
+        }
     }
 
     pub fn skip_twos(&mut self, flag: bool) {
         self._skip_twos = flag;
     }
 }
-
-

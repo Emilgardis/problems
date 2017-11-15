@@ -11,7 +11,10 @@ fn validate_nums(v: String) -> Result<(), String> {
     for num in v.split_whitespace() {
         match num.parse::<f64>() {
             Ok(num_f64) => {
-                if !num_f64.is_sign_positive() || num_f64 == 0.0 {
+                if num_f64 == 0.0 {
+                    return Err(String::from("Number must be a natural number >= 1"))
+                }
+                if !num_f64.is_sign_positive() {
                     return Err(String::from(format!("\"{}\" is not a positive number.", num)));
                 }
                 if !num_f64.is_normal() || num_f64.fract() != 0.0 {
